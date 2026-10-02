@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tierPixie</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--text:#1b1f24;--muted:#5f6b7a;--border:#dde2e8;--accent:#2f6fdb;--accent-soft:#e6eefc}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121417;--panel:#1b1e23;--text:#e6e9ee;--muted:#9aa4b2;--border:#30353d;--accent:#6b9cff;--accent-soft:#1d2a44}}
+:root[data-theme="dark"]{--bg:#121417;--panel:#1b1e23;--text:#e6e9ee;--muted:#9aa4b2;--border:#30353d;--accent:#6b9cff;--accent-soft:#1d2a44}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:56px 16px}
+h1{margin:0 0 6px;font-size:28px}
+p{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+a{display:block;padding:18px;border:1.5px solid var(--accent);border-radius:10px;background:var(--panel);color:var(--accent);text-decoration:none;font-weight:600;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+a:hover{background:var(--accent-soft)}
+a span{display:block;color:var(--muted);font-weight:400;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>🔒 tierPixie</h1>
+  <p>Match parent institution names. Choose a dataset; you’ll need the access code.</p>
+  <div class="grid">
+    <a href="DE_tierPixie.html">DE<span>Germany</span></a>
+    <a href="EU_tierPixie.html">EU<span>European Union</span></a>
+    <a href="UK_tierPixie.html">UK<span>United Kingdom</span></a>
+    <a href="US_tierPixie.html">US<span>United States</span></a>
+  </div>
+</main>
+</body>
+</html>

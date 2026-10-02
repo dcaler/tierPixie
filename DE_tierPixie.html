@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tierPixie DE</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f1f3f6; --text:#1b1f24; --muted:#5f6b7a; --border:#dde2e8;
+  --accent:#2f6fdb; --accent-soft:#e6eefc; --ok:#1f8a4c; --ok-soft:#e3f4ea; --warn:#b26a00; --warn-soft:#fff2dc;
+  --bad:#c23a3a; --bad-soft:#fde8e8; --infer:#6b4fbb; --infer-soft:#efeafb; --sel:#fff8d6;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --panel:#1b1e23; --panel2:#23272e; --text:#e6e9ee; --muted:#9aa4b2; --border:#30353d;
+    --accent:#6b9cff; --accent-soft:#1d2a44; --ok:#4cc27e; --ok-soft:#173326; --warn:#f0b44c; --warn-soft:#3a2c12;
+    --bad:#ff7b7b; --bad-soft:#3d1c1c; --infer:#b39cff; --infer-soft:#2a2342; --sel:#3a3418;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --panel:#1b1e23; --panel2:#23272e; --text:#e6e9ee; --muted:#9aa4b2; --border:#30353d;
+  --accent:#6b9cff; --accent-soft:#1d2a44; --ok:#4cc27e; --ok-soft:#173326; --warn:#f0b44c; --warn-soft:#3a2c12;
+  --bad:#ff7b7b; --bad-soft:#3d1c1c; --infer:#b39cff; --infer-soft:#2a2342; --sel:#3a3418;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1.5px solid var(--accent);background:var(--panel);color:var(--accent);border-radius:7px;padding:6px 14px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12);transition:background .12s,transform .05s}
+button:hover{background:var(--accent-soft)}
+button:active{transform:translateY(1px)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{filter:brightness(1.1);background:var(--accent)}
+button.btn-infer{background:var(--infer);border-color:var(--infer);color:#fff}
+button.btn-infer:hover{filter:brightness(1.1);background:var(--infer)}
+button.btn-drop{border-color:var(--muted);color:var(--text)}
+button.btn-drop:hover{background:var(--panel2)}
+button.small{padding:4px 10px;font-size:13px}
+button.ghost{border-color:transparent;background:transparent;box-shadow:none}
+nav button,.seg button,.menu .pop button,.tok button{box-shadow:none;font-weight:inherit;color:inherit;border-width:1px}
+.seg button{border-color:var(--border)}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=search],textarea,select{border:1px solid var(--border);background:var(--panel);border-radius:6px;padding:6px 8px;width:100%}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+kbd{font:11px var(--mono);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--panel2);color:var(--muted)}
+.muted{color:var(--muted)} .mono{font-family:var(--mono);font-size:12px}
+header{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--border)}
+.hbar{display:flex;gap:12px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+.hbar h1{font-size:17px;margin:0;white-space:nowrap}
+.prog{flex:1;min-width:180px;max-width:420px}
+.prog .bar{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--ok)}
+.prog small{color:var(--muted)}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+nav{display:flex;gap:2px;padding:0 12px;overflow-x:auto}
+nav button{border:none;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 12px;white-space:nowrap}
+nav button.on{border-bottom-color:var(--accent);font-weight:600}
+.badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:9px;font-size:11px;font-weight:600;text-align:center;background:var(--panel2);color:var(--muted)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)} .badge.ok{background:var(--ok-soft);color:var(--ok)}
+main{padding:14px 16px 60px;max-width:1500px;margin:0 auto}
+.intro{background:var(--accent-soft);border:1px solid var(--accent);border-left:6px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:14px;color:var(--text);font-size:15px;line-height:1.5}
+.intro b{color:var(--accent)}
+.dhead{position:sticky;top:var(--hh,94px);z-index:6;background:var(--panel);margin:-16px -16px 12px;padding:14px 16px 12px;border-bottom:1px solid var(--border);border-radius:8px 8px 0 0}
+.decide{display:flex;gap:10px;align-items:center}
+.decide .status{flex:1;min-width:0;padding:7px 12px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.status.match{background:var(--ok-soft);color:var(--ok)} .status.infer{background:var(--infer-soft);color:var(--infer)}
+.status.drop{background:var(--panel2);color:var(--muted)} .status.pending{background:var(--warn-soft);color:var(--warn)}
+.decide .dbtns{display:flex;gap:6px;flex:none}
+.dbtns button.on{border-color:var(--accent);background:var(--accent-soft)}
+details.more{margin-top:14px;border-top:1px solid var(--border);padding-top:8px}
+details.more summary{cursor:pointer;color:var(--muted);font-size:13px}
+.slot .top{justify-content:space-between}
+.slot .right{display:flex;gap:6px;align-items:center;flex:none}
+.split{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:14px;align-items:start}
+@media (max-width:820px){.split{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:8px}
+.list{position:sticky;top:var(--hh,94px);max-height:calc(100vh - var(--hh,94px) - 16px);display:flex;flex-direction:column}
+.list .tools{padding:10px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{padding:2px 8px;font-size:12px;border-radius:12px}
+.seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.items{overflow:auto;flex:1}
+.item{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-bottom:1px solid var(--border);cursor:pointer}
+.item:hover{background:var(--panel2)} .item.on{background:var(--accent-soft)}
+.item .nm{flex:1;min-width:0;word-break:break-word}
+.item .meta{font-size:11px;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex:none;background:var(--warn)}
+.dot.match{background:var(--ok)} .dot.infer{background:var(--infer)} .dot.drop{background:var(--muted)} .dot.none{background:var(--border)}
+.lv{display:inline-block;font:11px var(--mono);padding:0 4px;border-radius:3px;background:var(--panel2);color:var(--muted);margin-right:3px}
+.detail{padding:16px}
+.detail h2{margin:0 0 4px;font-size:20px;word-break:break-word}
+.section{margin-top:16px}
+.section h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 6px}
+.banner{padding:8px 12px;border-radius:6px;margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.banner.match{background:var(--ok-soft);color:var(--ok)} .banner.infer{background:var(--infer-soft);color:var(--infer)}
+.banner.drop{background:var(--panel2);color:var(--muted)} .banner.pending{background:var(--warn-soft);color:var(--warn)}
+.cand{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer;background:var(--panel)}
+.cand{align-items:center;transition:border-color .12s,box-shadow .12s}
+.cand:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.12)} .cand.chosen{border-color:var(--ok);background:var(--ok-soft)}
+.cand .pickbtn{display:inline-block;margin-top:4px;padding:5px 14px;border-radius:7px;border:1.5px solid var(--ok);color:var(--ok);font-weight:600;font-size:13px;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cand:hover .pickbtn{background:var(--ok);color:#fff}
+.cand.chosen .pickbtn{background:var(--ok);color:#fff}
+.cand .n{font:12px var(--mono);color:var(--muted);padding-top:2px}
+.cand .why{font-size:12px;color:var(--muted)}
+.score{text-align:right;font-size:13px;font-weight:600;color:var(--muted)}
+.score .sb{height:5px;background:var(--panel2);border-radius:3px;margin-top:4px;overflow:hidden}
+.score .sb i{display:block;height:100%;background:var(--accent)}
+.tier{display:inline-block;font-size:11px;padding:0 6px;border-radius:9px;background:var(--panel2);color:var(--muted);margin-left:4px}
+.tier.ok{background:var(--ok-soft);color:var(--ok)} .tier.off{background:var(--warn-soft);color:var(--warn)}
+.warnline{font-size:12px;color:var(--warn)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.occ{font-size:13px;margin:0;padding-left:18px} .occ li{margin:2px 0}
+.cells{display:flex;flex-direction:column;gap:6px}
+.cellrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.cellrow code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:12px}
+.tok{display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 8px;border-radius:12px;font-size:12px;margin:2px 4px 2px 0;border:1px solid transparent;max-width:100%}
+.tok.match{background:var(--ok-soft);color:var(--ok)} .tok.infer{background:var(--infer-soft);color:var(--infer)}
+.tok.pending{background:var(--warn-soft);color:var(--warn)} .tok.drop{background:var(--panel2);color:var(--muted);text-decoration:line-through}
+.tok button{border:none;background:none;padding:0 4px;color:inherit;font-size:13px;line-height:1}
+.tok span{overflow:hidden;text-overflow:ellipsis}
+.slotcards{display:flex;flex-direction:column;gap:10px}
+.slot{padding:12px 14px;border-left:4px solid var(--border)}
+.slot.on{border-left-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.slot.st-pending{border-left-color:var(--warn)} .slot.st-filled{border-left-color:var(--ok)} .slot.st-blank,.slot.st-nosug{border-left-color:var(--muted)}
+.slot.on.st-pending,.slot.on.st-filled,.slot.on.st-blank,.slot.on.st-nosug{border-left-color:var(--accent)}
+.slot .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.pfx{color:var(--muted)}
+.ctx{font-size:12px;color:var(--muted);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1.5px solid var(--accent);border-radius:8px;padding:6px 10px;text-align:left;background:var(--panel);max-width:100%;color:var(--text);font-weight:400}
+.chip:hover{background:var(--accent-soft);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.chip .lbl{font-size:11px;color:var(--muted);display:block}
+.ed{position:relative;margin-top:8px}
+.ac{position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--panel);border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);max-height:320px;overflow:auto}
+.ac div{padding:6px 10px;cursor:pointer;font-size:13px}
+.ac div.hi,.ac div:hover{background:var(--accent-soft)}
+.cluster{padding:12px 14px;margin-bottom:10px}
+.cluster.done{border-color:var(--ok)}
+.mem{display:grid;grid-template-columns:24px 24px 1fr auto;gap:6px;align-items:center;padding:3px 0;font-size:13px}
+table{border-collapse:collapse;width:100%;background:var(--panel)}
+th,td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top;font-size:13px}
+th{position:sticky;top:0;background:var(--panel2);font-size:12px;z-index:5}
+td.cellv{cursor:pointer;min-width:160px} td.cellv:hover{background:var(--accent-soft)}
+.orig{font-size:11px;color:var(--muted);margin-top:2px}
+.wl{font-size:12px;color:var(--warn);margin:0;padding-left:14px}
+.tablewrap{overflow:auto;max-height:calc(100vh - var(--hh,94px) - 24px);border:1px solid var(--border);border-radius:8px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{padding:8px 14px;min-width:120px} .stat b{display:block;font-size:20px}
+.modalbg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:60px 16px}
+.modal{width:min(720px,100%);padding:18px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:6px;z-index:60;font-size:13px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.menu{position:relative} .menu .pop{position:absolute;right:0;top:110%;background:var(--panel);border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:40;display:flex;flex-direction:column;min-width:220px;padding:4px}
+.menu .pop button{border:none;text-align:left;background:none} .menu .pop button:hover{background:var(--accent-soft)}
+.hidden,.menu .pop.hidden{display:none}
+#lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+#lock form{width:min(380px,100%);padding:28px;display:flex;flex-direction:column;gap:12px}
+#lock h2{margin:0;font-size:22px}
+#lock .err{color:var(--bad);font-size:13px;min-height:18px}
+.nostore{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);border:1px solid var(--warn);border-left:6px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:14.5px}
+button.warnbtn{background:var(--warn);border-color:var(--warn);color:#fff}
+button.warnbtn:hover{filter:brightness(1.1);background:var(--warn)}
+.undonote{display:block;margin-top:6px;font-size:13.5px;color:var(--muted)} .undonote b{color:var(--text)}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:stretch}
+.opts .chips{display:contents}
+button.optbtn{padding:6px 14px;font-size:13px}
+button.blankbtn{border:1.5px dashed var(--text);color:var(--text);background:var(--panel2)}
+button.blankbtn:hover{background:var(--border)}
+.current{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.statusp{font-size:12px;font-weight:600;padding:2px 10px;border-radius:10px}
+.statusp.pending{background:var(--warn-soft);color:var(--warn)} .statusp.filled{background:var(--ok-soft);color:var(--ok)}
+.statusp.blank,.statusp.nosug{background:var(--panel2);color:var(--muted)}
+button.stat{text-align:left;color:var(--text);font-weight:400;border:1px solid var(--border);background:var(--panel);padding:8px 14px;min-width:130px;font-size:13px}
+button.stat:hover{border-color:var(--accent);background:var(--panel)}
+button.stat.on{border:2px solid var(--accent);background:var(--accent-soft)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <h1 id="title">tierPixie</h1>
+    <div class="prog" id="prog"></div>
+    <div class="hbtns">
+      <span class="muted" id="saved" style="font-size:12px;align-self:center"></span>
+      <button id="undoBtn" data-act="undo" title="Undo (Ctrl/Cmd+Z)">↶ Undo</button>
+      <button class="primary" data-act="export">⬇ Export CSV</button>
+      <div class="menu"><button data-act="menu">⋯</button>
+        <div class="pop hidden" id="menuPop">
+          <button data-act="saveProg">Save progress file (.json)…</button>
+          <button data-act="loadProg">Load progress file…</button>
+          <button data-act="openCsv">Open a different CSV…</button>
+          <button data-act="forgetCode" id="forgetBtn" class="hidden">Forget access code on this device</button>
+          <button data-act="reset" style="color:var(--bad)">Reset all decisions…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+<main id="main"></main>
+<div id="modal"></div>
+<div id="lock" class="hidden"><form class="card" id="lockForm">
+  <h2>🔒 tierPixie · DE</h2>
+  <div class="muted">Enter the access code to open this tool.</div>
+  <input type="password" id="lockPass" placeholder="Access code" autocomplete="current-password">
+  <label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="lockRemember" checked> Remember on this device</label>
+  <button class="primary" type="submit" id="lockBtn">Unlock</button>
+  <div class="err" id="lockErr"></div>
+</form></div>
+<input type="file" id="fileCsv" accept=".csv,text/csv" class="hidden">
+<input type="file" id="fileProg" accept=".json,application/json" class="hidden">
+
+<script>
+const EMBED = {"code": "DE", "file": "DE.csv", "enc": {"salt": "4vUWuWOg1ML/XLwg/02bfA==", "iv": "+r6SpqaZGseKkvr2", "ct": "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", "iter": 250000}};
+
+/* ---------- utilities ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STOP = new Set(['the','of','for','and','in','on','to','a','an','fur','und','der','die','das','de','des','et','la','le','du','und']);
+const deacc = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '');
+const norm = s => deacc(s).toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
+const key = norm;
+const toks = s => norm(s).split(' ').filter(t => t && !STOP.has(t));
+function initials(s, keepStop){ const w = norm(s).split(' ').filter(Boolean).filter(t => keepStop || !STOP.has(t)); return w.length >= 2 ? w.map(t => t[0]).join('') : ''; }
+function trigrams(s){ const t = ' ' + s + ' ', o = new Set(); for (let i = 0; i < t.length - 2; i++) o.add(t.slice(i, i + 3)); return o; }
+function diceSet(A, B){ if (!A.size || !B.size) return 0; let n = 0; A.forEach(x => { if (B.has(x)) n++; }); return 2 * n / (A.size + B.size); }
+const dice = (a, b) => diceSet(new Set(a), new Set(b));
+function hash(s){ let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+const isBlank = v => !v || /^\s*(NA|N\/A|null|none|-)?\s*$/i.test(v);
+const PCOL = k => `tier_${k}_parent_name`;
+function toast(msg){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+
+function parseCSV(t){
+  const rows = []; let row = [], f = '', q = false, i = 0;
+  while (i < t.length){
+    const c = t[i];
+    if (q){ if (c === '"'){ if (t[i+1] === '"'){ f += '"'; i += 2; continue; } q = false; i++; continue; } f += c; i++; continue; }
+    if (c === '"'){ q = true; i++; continue; }
+    if (c === ','){ row.push(f); f = ''; i++; continue; }
+    if (c === '\r'){ i++; continue; }
+    if (c === '\n'){ row.push(f); rows.push(row); row = []; f = ''; i++; continue; }
+    f += c; i++;
+  }
+  if (f !== '' || row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+const csvCell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+
+/* ---------- name features & similarity ---------- */
+function feat(s){
+  s = String(s);
+  const full = norm(s);
+  // split on ':' and keep each segment's bracketed text with it; a segment that is only brackets
+  // (e.g. "BMUV: (Federal Ministry …)") belongs to the segment before it
+  const segs = [];
+  s.split(':').forEach(raw => {
+    const parens = [...raw.matchAll(/\(([^()]*)\)/g)].map(m => m[1].trim());
+    const core = raw.replace(/\([^()]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!core && segs.length) segs[segs.length - 1].parens.push(...parens);
+    else if (core || parens.length) segs.push({ core: core || parens.join(' '), parens });
+  });
+  if (!segs.length) segs.push({ core: s.trim(), parens: [] });
+  const last = segs[segs.length - 1], self = last.core, selfN = norm(self);
+  const shortTok = x => { const n = norm(x); return n && !n.includes(' ') && n.length <= 12 ? n : ''; };
+  const acrS = new Set();   // explicit acronyms: bare token, “(ABC)”, “ABC - …”
+  if (selfN && !selfN.includes(' ') && selfN.length <= 10) acrS.add(selfN);
+  last.parens.forEach(p => { const n = shortTok(p); if (n) acrS.add(n); });
+  const dash = self.match(/^(\S{2,10})\s+[-–]\s+/); if (dash) acrS.add(norm(dash[1]));
+  const acr = new Set(acrS);  // plus acronyms built from initials (3+ letters, to avoid noise)
+  [initials(self, true), initials(self, false)].forEach(x => { if (x.length >= 3) acr.add(x); });
+  const prefixN = [];
+  segs.slice(0, -1).forEach(g => { prefixN.push(norm(g.core)); g.parens.forEach(p => { const n = shortTok(p); if (n) prefixN.push(n); }); });
+  const coreN = norm(segs.map(g => g.core).join(' : '));
+  return { full, selfN, coreN, prefixN, tSelf: toks(self), tFull: toks(s), tri: trigrams(full), triSelf: trigrams(selfN), acr, acrS };
+}
+const featCache = new Map();
+function F(s){ let f = featCache.get(s); if (!f){ f = feat(s); featCache.set(s, f); } return f; }
+
+function sim(p, c){
+  let s = 0, why = '';
+  const up = (v, w) => { if (v > s){ s = v; why = w; } };
+  if (p.full && p.full === c.full) up(1, 'exact name');
+  if (p.coreN && p.coreN === c.coreN) up(0.97, 'same name, ignoring brackets');
+  if (p.selfN && p.selfN === c.selfN) up(0.95, 'same name, ignoring prefix');
+  if (p.full && (p.full === c.selfN || p.selfN === c.full)) up(0.95, 'same name, ignoring prefix');
+  for (const a of p.acr) if (c.acr.has(a)) up(p.acrS.has(a) && c.acrS.has(a) ? 0.92 : 0.86, (c.acrS.has(a) ? 'acronym ' : 'initials ') + a.toUpperCase());
+  up(0.9 * dice(p.tSelf, c.tSelf), 'shared words');
+  up(0.85 * dice(p.tFull, c.tFull), 'shared words');
+  up(0.85 * diceSet(p.tri, c.tri), 'similar spelling');
+  up(0.85 * diceSet(p.triSelf, c.triSelf), 'similar spelling');
+  const child = c.prefixN.some(x => x && (x === p.selfN || x === p.coreN || p.acr.has(x)));
+  if (child) s *= 0.5;
+  return { score: s, why, child };
+}
+
+/* ---------- data ---------- */
+let CODE, FILE, CSVTEXT, HEAD, ROWS, ROWBY, BYID, INST, LEVELS, TIERCOL, HASH, S, UNDO = [];
+const UI = { moreSug: {}, other: {}, det: {}, tab: 1, f1: 'pending', lv1: 'all', q1: '', sel1: null, cq: '', splitEdit: null, f2: 'pending', sel2: 0, f4: 'all', q4: '', modal: null, ac: null };
+const candCache = new Map();
+
+function tierOf(r){ const t = parseInt(r[TIERCOL], 10); return isNaN(t) ? 99 : t; }
+function blankState(){ return { decisions: {}, overrides: {}, blankDone: {}, splits: {}, canon: {}, hSplit: {}, hMerge: [], hConfirmed: {} }; }
+const storeKey = () => `parent-matcher:${CODE}:${HASH}`;
+// Some hosts (e.g. the Dropbox web preview) sandbox the page and block browser storage.
+// Then nothing autosaves, so keep a visible Save button and warn before leaving with unsaved work.
+const STORAGE_OK = (() => { try { localStorage.setItem('__tp', '1'); localStorage.removeItem('__tp'); return true; } catch (e){ return false; } })();
+let UNSAVED = 0, SAVED_TO_FILE = false;
+function save(){
+  if (STORAGE_OK){
+    try { localStorage.setItem(storeKey(), JSON.stringify(S)); $('#saved').textContent = 'Autosaved in this browser · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); return; } catch (e){}
+  }
+  UNSAVED++; showSaveState();
+}
+function showSaveState(){
+  if (STORAGE_OK) return;
+  $('#saved').innerHTML = `<button class="warnbtn" data-act="saveProg">${UNSAVED ? `⚠ ${UNSAVED} unsaved change${UNSAVED > 1 ? 's' : ''}: save progress` : SAVED_TO_FILE ? '✓ Progress saved to file' : 'Save progress'}</button>`;
+}
+window.addEventListener('beforeunload', ev => { if (!STORAGE_OK && UNSAVED){ ev.preventDefault(); ev.returnValue = ''; } });
+function loadStored(){ try { const v = localStorage.getItem(storeKey()); return v ? Object.assign(blankState(), JSON.parse(v)) : null; } catch (e){ return null; } }
+
+function init(code, file, text){
+  CODE = code; FILE = file; CSVTEXT = text.replace(/^﻿/, '');
+  const t = parseCSV(CSVTEXT);
+  HEAD = t[0].map(h => h.trim());
+  ROWS = t.slice(1).filter(r => r.some(c => c.trim())).map(r => { const o = {}; HEAD.forEach((h, i) => o[h] = (r[i] ?? '').trim()); return o; });
+  TIERCOL = HEAD.find(h => /^tier(_\d)+$/.test(h)) || 'tier_1_2_3';
+  LEVELS = HEAD.map(h => h.match(/^tier_(\d+)_parent_name$/)).filter(Boolean).map(m => +m[1]).sort((a, b) => a - b);
+  ROWBY = {}; ROWS.forEach(r => ROWBY[r.unique_id] = r);
+  INST = ROWS.map(r => ({ id: r.unique_id, name: r.institution_name, tier: tierOf(r), f: feat(r.institution_name) }));
+  BYID = {}; INST.forEach(i => BYID[i.id] = i);
+  HASH = hash(CSVTEXT); candCache.clear(); featCache.clear();
+  S = loadStored() || blankState(); UNDO = []; UNSAVED = 0; showSaveState();
+  UI.sel1 = null; UI.sel2 = 0;
+  document.title = `tierPixie · ${CODE}`;
+  $('#title').innerHTML = `tierPixie · ${esc(CODE)} <span class="muted" style="font-weight:400;font-size:13px">${esc(FILE)} · ${ROWS.length} institutions</span>`;
+  render();
+}
+
+/* cells → entries ({name} raw text, or {id} direct institution) */
+function splitCell(text){
+  const sp = S.splits[key(text)];
+  if (sp) return sp.slice();
+  const out = [];
+  text.split(';').forEach(seg => {
+    let depth = 0, cur = '';
+    for (const ch of seg){
+      if (ch === '(') depth++; else if (ch === ')') depth = Math.max(0, depth - 1);
+      if (ch === ',' && depth === 0){ out.push(cur); cur = ''; } else cur += ch;
+    }
+    out.push(cur);
+  });
+  const res = [];
+  out.map(x => x.trim()).filter(Boolean).forEach(x => {
+    if (res.length && /^(phase|and|inc|ltd|gmbh|llc)\b|^\d/i.test(x)) res[res.length - 1] += ', ' + x; else res.push(x);
+  });
+  return res;
+}
+function cellParts(r, k){
+  const ov = S.overrides[r.unique_id]?.[k];
+  if (ov) return ov;
+  const v = r[PCOL(k)];
+  if (isBlank(v)) return [];
+  return splitCell(v).map(n => ({ name: n }));
+}
+function resolve(e){
+  if (e.id){ return { status: 'match', id: e.id, name: BYID[e.id]?.name ?? e.id, direct: true }; }
+  const k = key(e.name), d = S.decisions[k];
+  if (!d) return { status: 'pending', name: e.name, key: k };
+  if (d.type === 'match') return { status: 'match', id: d.id, name: BYID[d.id]?.name ?? d.id, via: e.name };
+  if (d.type === 'drop') return { status: 'drop', name: e.name, key: k };
+  return { status: 'infer', name: S.canon[k] ?? e.name, raw: e.name, key: k };
+}
+const rsig = x => x.status === 'match' ? 'id:' + x.id : x.status === 'infer' ? 'n:' + key(x.name) : 'p:' + key(x.name);
+function resolvedCell(r, k){
+  const seen = new Set(), out = [];
+  cellParts(r, k).map(resolve).filter(x => x.status !== 'drop').forEach(x => { const s = rsig(x); if (!seen.has(s)){ seen.add(s); out.push(x); } });
+  return out;
+}
+
+function buildPool(){
+  const pool = new Map();
+  for (const r of ROWS) for (const k of LEVELS) cellParts(r, k).forEach(e => {
+    if (e.id) return;
+    const kk = key(e.name); if (!kk) return;
+    let p = pool.get(kk);
+    if (!p){ p = { key: kk, name: e.name, variants: new Set(), occ: [], levels: new Set() }; pool.set(kk, p); }
+    p.variants.add(e.name); p.occ.push({ id: r.unique_id, k }); p.levels.add(k);
+  });
+  return pool;
+}
+function candidates(name, levels){
+  const ck = name + '§' + [...levels].sort().join(',');
+  if (candCache.has(ck)) return candCache.get(ck);
+  const p = F(name);
+  const out = INST.map(c => { const r = sim(p, c.f); const tierOk = levels.has(c.tier); return { c, ...r, tierOk, rank: r.score + (tierOk ? 0.06 : 0) }; })
+    .filter(x => x.score >= 0.2).sort((a, b) => b.rank - a.rank);
+  candCache.set(ck, out);
+  return out;
+}
+function searchInst(q){
+  q = q.trim(); if (!q) return [];
+  const p = feat(q), nq = norm(q);
+  return INST.map(c => {
+    let s = sim(p, c.f).score;
+    if (nq && norm(c.name).includes(nq)) s = Math.max(s, 0.75);
+    if (c.id.toLowerCase() === q.toLowerCase()) s = 1;
+    return { c, score: s };
+  }).filter(x => x.score > 0.15).sort((a, b) => b.score - a.score).slice(0, 10);
+}
+
+/* ---------- blank-cell suggestions ---------- */
+const SEGSPLIT = /\s*(?:\/|&|,\s*and\s+|,|\s+and\s+)\s*/i;
+const segsOf = name => name.split(':').map(s => s.trim()).filter(Boolean);
+function suggestions(r, k){
+  const t = tierOf(r), id = r.unique_id, out = [], seen = new Set();
+  const push = (entries, label, detail) => {
+    if (!entries.length) return;
+    const sig = entries.map(e => rsig(resolve(e))).sort().join('|');
+    if (seen.has(sig)) return; seen.add(sig); out.push({ entries, label, detail });
+  };
+  const fromSeg = seg => seg.split(SEGSPLIT).map(s => s.trim()).filter(Boolean).map(part => {
+    const b = candidates(part, new Set([k])).find(x => x.c.id !== id && !x.child);
+    return b && b.score >= 0.8 ? { id: b.c.id } : { name: part };
+  });
+  const prefix = segsOf(r.institution_name).slice(0, -1);
+  const idx = prefix.length - (t - k);
+  if (idx >= 0 && idx < prefix.length) push(fromSeg(prefix[idx]), `From name prefix “${prefix[idx]}”`, 'position in the name matches this tier');
+  for (const j of LEVELS){
+    if (j <= k) continue;
+    for (const x of resolvedCell(r, j)){
+      if (x.status !== 'match' || !ROWBY[x.id]) continue;
+      const parts = cellParts(ROWBY[x.id], k);
+      if (parts.length) push(parts.map(e => ({ ...e })), `Inherited from ${x.id}`, `its tier_${k} parent (it is this row’s tier_${j} parent)`);
+    }
+  }
+  if (prefix.length){
+    const sp = (idx >= 0 ? prefix.slice(0, idx + 1) : prefix).map(norm);
+    const counts = new Map();
+    for (const o of ROWS){
+      if (o === r) continue;
+      const op = segsOf(o.institution_name).slice(0, -1).map(norm);
+      if (op.length < sp.length || sp.some((s, i) => s !== op[i])) continue;
+      const parts = cellParts(o, k); if (!parts.length) continue;
+      const sig = parts.map(e => rsig(resolve(e))).sort().join('|');
+      const c = counts.get(sig) || { n: 0, parts }; c.n++; counts.set(sig, c);
+    }
+    [...counts.values()].sort((a, b) => b.n - a.n).slice(0, 3)
+      .forEach(c => push(c.parts.map(e => ({ ...e })), `Used by ${c.n} similar row${c.n > 1 ? 's' : ''}`, `rows also named “${sp.join(': ')}: …”`));
+  }
+  prefix.forEach((seg, i) => { if (i !== idx) push(fromSeg(seg), `Other prefix “${seg}”`, 'lower confidence'); });
+  return out;
+}
+function blankSlots(){
+  const out = [];
+  for (const r of ROWS){
+    const t = tierOf(r);
+    for (const k of [...LEVELS].reverse()){   // closest parent first: filling it unlocks “inherited” suggestions above it
+      if (k >= t || !isBlank(r[PCOL(k)])) continue;
+      const sk = r.unique_id + '|' + k, ov = S.overrides[r.unique_id]?.[k];
+      const sug = suggestions(r, k);
+      const status = ov ? (ov.length ? 'filled' : 'blank') : S.blankDone[sk] ? 'blank' : sug.length ? 'pending' : 'nosug';
+      out.push({ r, k, sk, sug, status });
+    }
+  }
+  return out;
+}
+
+/* ---------- harmonising inferred names ---------- */
+function related(a, b){
+  if (a.coreN && a.coreN === b.coreN) return true;
+  if (a.selfN && a.selfN === b.selfN) return true;
+  for (const x of a.acr) if (b.acr.has(x)) return true;
+  if (dice(a.tFull, b.tFull) >= 0.75) return true;
+  if (diceSet(a.tri, b.tri) >= 0.8) return true;
+  return false;
+}
+function clusters(pool){
+  pool = pool || buildPool();
+  const inf = [...pool.values()].filter(p => S.decisions[p.key]?.type === 'infer');
+  const par = {}; inf.forEach(p => par[p.key] = p.key);
+  const find = x => par[x] === x ? x : (par[x] = find(par[x]));
+  const uni = (a, b) => { a = find(a); b = find(b); if (a !== b) par[a] = b; };
+  for (let i = 0; i < inf.length; i++) for (let j = i + 1; j < inf.length; j++){
+    const a = inf[i], b = inf[j];
+    if (S.hSplit[a.key] || S.hSplit[b.key]) continue;
+    if (related(F(a.name), F(b.name))) uni(a.key, b.key);
+  }
+  S.hMerge.forEach(([a, b]) => { if (par[a] && par[b]) uni(a, b); });
+  const g = new Map();
+  inf.forEach(p => { const r = find(p.key); if (!g.has(r)) g.set(r, []); g.get(r).push(p); });
+  return [...g.values()].map(members => {
+    members.sort((a, b) => b.occ.length - a.occ.length || b.name.length - a.name.length);
+    const sig = members.map(m => m.key).sort().join('§');
+    const canons = new Set(members.map(m => S.canon[m.key] ?? m.name));
+    const current = canons.size === 1 ? [...canons][0] : members[0].name;
+    return { sig, members, current, done: members.length < 2 || !!S.hConfirmed[sig] };
+  }).sort((a, b) => b.members.length - a.members.length || a.current.localeCompare(b.current));
+}
+
+/* ---------- validation ---------- */
+function warnings(r){
+  const w = [], t = tierOf(r), lv = {};
+  LEVELS.forEach(k => lv[k] = resolvedCell(r, k));
+  for (const k of LEVELS){
+    if (lv[k].some(x => x.status === 'pending')) w.push(`tier_${k}: name not yet decided`);
+    if (lv[k].length && k >= t) w.push(`tier_${k} parent given for a tier-${t} institution`);
+    lv[k].forEach(x => {
+      if (x.status !== 'match') return;
+      if (x.id === r.unique_id) w.push(`tier_${k}: points to itself`);
+      else if (BYID[x.id] && BYID[x.id].tier !== k) w.push(`tier_${k} parent ${x.id} is a tier-${BYID[x.id].tier} institution`);
+    });
+    if (k < t && !lv[k].length && isBlank(r[PCOL(k)]) && !S.overrides[r.unique_id]?.[k] && !S.blankDone[r.unique_id + '|' + k] && suggestions(r, k).length) w.push(`tier_${k}: blank, suggestion not reviewed`);
+  }
+  for (const j of LEVELS) for (const x of lv[j]){
+    if (x.status !== 'match' || !ROWBY[x.id] || x.id === r.unique_id) continue;
+    for (const i of LEVELS){
+      if (i >= j) continue;
+      const mine = new Set(lv[i].map(rsig)), theirs = new Set(resolvedCell(ROWBY[x.id], i).map(rsig));
+      if (mine.size && theirs.size && (mine.size !== theirs.size || [...mine].some(s => !theirs.has(s))))
+        w.push(`tier_${i} differs from the tier_${i} parent of ${x.id}`);
+    }
+  }
+  return w;
+}
+
+/* ---------- state changes ---------- */
+function act(fn){
+  UNDO.push(JSON.stringify(S)); if (UNDO.length > 300) UNDO.shift();
+  fn(); save(); render();
+}
+function undo(){ if (!UNDO.length) return toast('Nothing to undo'); S = JSON.parse(UNDO.pop()); save(); render(); toast('Undone'); }
+function setOverride(rowId, k, entries){ (S.overrides[rowId] ||= {})[k] = entries; }
+function clearOverride(rowId, k){ if (S.overrides[rowId]){ delete S.overrides[rowId][k]; if (!Object.keys(S.overrides[rowId]).length) delete S.overrides[rowId]; } }
+
+/* ---------- rendering ---------- */
+function stats(){
+  const pool = buildPool(), names = [...pool.values()];
+  const p1 = names.filter(n => !S.decisions[n.key]).length;
+  const bs = blankSlots(), p2 = bs.filter(b => b.status === 'pending').length;
+  const cl = clusters(pool), p3 = cl.filter(c => !c.done).length;
+  const total = names.length + bs.filter(b => b.status !== 'nosug').length + cl.filter(c => c.members.length > 1).length;
+  return { pool, names, bs, cl, p1, p2, p3, total, done: total - p1 - p2 - p3 };
+}
+let ST;
+function render(){
+  document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
+  const a = document.activeElement, fid = a && a.id, ss = a && a.selectionStart;
+  ST = stats();
+  const pct = ST.total ? Math.round(100 * ST.done / ST.total) : 100;
+  $('#prog').innerHTML = `<div class="bar"><i style="width:${pct}%"></i></div><small>${ST.done} of ${ST.total} decisions made (${pct}%)${ST.p1 + ST.p2 + ST.p3 === 0 ? ' · all done, ready to export' : ''}</small>`;
+  $('#undoBtn').disabled = !UNDO.length;
+  const nw = ROWS.filter(r => warnings(r).length).length;
+  const tabs = [[1, 'Match parent names', ST.p1], [2, 'Fill blank parents', ST.p2], [3, 'Harmonise new parents', ST.p3], [4, 'Review & export', nw]];
+  $('#tabs').innerHTML = tabs.map(([n, l, c]) => `<button data-act="tab" data-v="${n}" class="${UI.tab === n ? 'on' : ''}">${n}. ${l} <span class="badge ${c ? 'warn' : 'ok'}">${c ? c : '✓'}</span></button>`).join('');
+  const m = $('#main');
+  m.innerHTML = UI.tab === 1 ? renderMatch() : UI.tab === 2 ? renderBlanks() : UI.tab === 3 ? renderHarm() : renderReview();
+  if (!STORAGE_OK && !UI.noStoreDismissed) m.insertAdjacentHTML('afterbegin', `<div class="nostore"><div><b>This page can’t autosave here.</b> The site hosting it (for example the Dropbox web preview) blocks browser storage. Click <b>Save progress</b> (top right) regularly to download a progress file. Next time, open the tool and use <b>⋯ → Load progress file</b> to carry on. For automatic saving, download the .html file and open it from your computer instead.</div><button class="small btn-drop" data-act="dismissNoStore" style="white-space:nowrap">Got it</button></div>`);
+  $('#modal').innerHTML = UI.modal ? renderModal() : '';
+  if (fid){ const e = document.getElementById(fid); if (e){ e.focus(); try { if (ss != null) e.setSelectionRange(ss, ss); } catch (_){} } }
+  const on = document.querySelector('.item.on, .slot.on');
+  if (on && UI.scroll){ on.scrollIntoView({ block: 'nearest' }); UI.scroll = false; }
+}
+
+function tierBadge(t, expected){
+  const ok = expected.has(t);
+  return `<span class="tier ${ok ? 'ok' : expected.size ? 'off' : ''}" title="${ok ? 'expected tier' : 'not the expected tier'}">tier ${t}</span>`;
+}
+function tokHTML(x, rm){
+  const cls = x.status;
+  let label = x.status === 'match' ? `${x.id} · ${x.name}` : x.status === 'infer' ? `${x.name} (new)` : x.status === 'pending' ? `${x.name} (undecided)` : x.name;
+  const title = x.status === 'match' ? (x.via ? `matched via “${x.via}”` : 'picked directly') : x.status === 'infer' ? `inferred parent${x.raw && x.raw !== x.name ? ` (written “${x.raw}”)` : ''}` : x.status === 'pending' ? 'decide this name in tab 1' : 'dropped';
+  return `<span class="tok ${cls}" title="${esc(title)}"><span>${esc(label)}</span>${rm != null ? `<button data-act="rmEntry" ${rm} title="remove">×</button>` : ''}</span>`;
+}
+
+/* tab 1 */
+function nameStatus(k){ const d = S.decisions[k]; return d ? d.type : 'pending'; }
+function visibleNames(){
+  const q = norm(UI.q1);
+  return ST.names.filter(n => {
+    const st = nameStatus(n.key);
+    if (UI.f1 === 'pending' && st !== 'pending') return false;
+    if (UI.f1 === 'decided' && st === 'pending') return false;
+    if (UI.lv1 !== 'all' && !n.levels.has(+UI.lv1)) return false;
+    if (q && !norm([...n.variants].join(' ')).includes(q)) return false;
+    return true;
+  }).sort((a, b) => Math.min(...a.levels) - Math.min(...b.levels) || b.occ.length - a.occ.length || a.name.localeCompare(b.name));
+}
+function renderMatch(){
+  const list = visibleNames();
+  if (UI.sel1 && !ST.pool.has(UI.sel1)) UI.sel1 = null;
+  if (!UI.sel1 || (!list.find(n => n.key === UI.sel1) && UI.f1 !== 'all' && !UI.keep)) UI.sel1 = list[0]?.key ?? UI.sel1;
+  UI.keep = false;
+  const pend = ST.names.filter(n => nameStatus(n.key) === 'pending');
+  const exact = pend.filter(n => { const c = candidates(n.name, n.levels); return c[0] && c[0].score >= 0.95 && c[0].tierOk && !c[0].child && !(c[1] && c[1].score >= 0.95); });
+  const low = pend.filter(n => { const c = candidates(n.name, n.levels); return !c[0] || c[0].score < 0.45; });
+  const cnt = f => ST.names.filter(n => f === 'all' || (f === 'pending') === (nameStatus(n.key) === 'pending')).length;
+  return `<div class="intro">Each name below appears in a <b>parent column</b>. For each one, click the institution in this file that it refers to, or choose <b>No match</b> if the parent isn’t listed (it will be added as a new parent). Your choice applies everywhere the name is used. <span class="undonote">Made a mistake? Press <b>Ctrl+Z</b> (<b>⌘Z</b> on a Mac) to undo.</span></div>
+  <div class="split">
+    <div class="card list">
+      <div class="tools">
+        <input type="search" id="q1" placeholder="Filter names…" value="${esc(UI.q1)}">
+        <div class="seg">${['pending', 'decided', 'all'].map(f => `<button data-act="f1" data-v="${f}" class="${UI.f1 === f ? 'on' : ''}">${f[0].toUpperCase() + f.slice(1)} ${cnt(f)}</button>`).join('')}</div>
+        ${exact.length || low.length ? `<div class="seg">${exact.length ? `<button data-act="bulkExact" title="Pending names whose best candidate is an exact name match of the expected tier">✓ Accept ${exact.length} exact match${exact.length > 1 ? 'es' : ''}</button>` : ''}${low.length ? `<button data-act="bulkLow" title="Pending names whose best candidate scores under 45%">∅ ${low.length} with no plausible match → new</button>` : ''}</div>` : ''}
+      </div>
+      <div class="items">${list.length ? list.map(n => {
+        const st = nameStatus(n.key), d = S.decisions[n.key];
+        const sub = st === 'match' ? `→ ${d.id} · ${BYID[d.id]?.name ?? ''}` : st === 'infer' ? `new parent${S.canon[n.key] && S.canon[n.key] !== n.name ? ' → ' + S.canon[n.key] : ''}` : st === 'drop' ? 'dropped' : (() => { const c = candidates(n.name, n.levels)[0]; return c ? `best: ${c.c.id} (${Math.round(c.score * 100)}%)` : 'no candidates'; })();
+        return `<div class="item ${n.key === UI.sel1 ? 'on' : ''}" data-act="sel1" data-k="${esc(n.key)}"><span class="dot ${st}"></span><div class="nm">${esc(n.name)}<div class="meta">${[...n.levels].sort().map(l => `<span class="lv">t${l}</span>`).join('')}×${n.occ.length} · ${esc(sub)}</div></div></div>`;
+      }).join('') : `<div class="empty">${UI.f1 === 'pending' ? '🎉 No pending names. Switch to “All” to review your decisions.' : 'Nothing matches.'}</div>`}</div>
+    </div>
+    <div class="card detail">${UI.sel1 && ST.pool.get(UI.sel1) ? renderNameDetail(ST.pool.get(UI.sel1)) : '<div class="empty">Select a name on the left.</div>'}</div>
+  </div>`;
+}
+function renderNameDetail(n){
+  const d = S.decisions[n.key], st = nameStatus(n.key);
+  const levels = n.levels;
+  const byLevel = LEVELS.filter(l => levels.has(l)).map(l => `tier_${l} parent ×${n.occ.filter(o => o.k === l).length}`).join(', ');
+  const hasExpected = INST.some(c => levels.has(c.tier));
+  let cands;
+  if (UI.cq.trim()) cands = searchInst(UI.cq).map(x => ({ ...x, ...sim(F(n.name), x.c.f), score: x.score, tierOk: levels.has(x.c.tier) }));
+  else cands = candidates(n.name, levels).filter(x => x.score >= 0.35).slice(0, 6);
+  const banner = st === 'match' ? `<div class="banner match">✓ Matched to <b>${esc(d.id)}</b> · ${esc(BYID[d.id]?.name ?? '?')} <button class="small" data-act="clear">Clear (U)</button></div>`
+    : st === 'infer' ? `<div class="banner infer">∅ No match: will be inferred as a new parent${S.canon[n.key] && S.canon[n.key] !== n.name ? ` (harmonised to “${esc(S.canon[n.key])}”)` : ''} <button class="small" data-act="clear">Clear (U)</button></div>`
+    : st === 'drop' ? `<div class="banner drop">✕ Dropped: not treated as a parent <button class="small" data-act="clear">Clear (U)</button></div>`
+    : `<div class="banner pending">Undecided</div>`;
+  const occRows = n.occ.map(o => `<li><span class="lv">tier_${o.k}</span> <span class="mono">${esc(o.id)}</span> ${esc(ROWBY[o.id].institution_name)} <span class="tier">tier ${tierOf(ROWBY[o.id])}</span></li>`).join('');
+  const cellTexts = [...new Set(n.occ.map(o => ROWBY[o.id][PCOL(o.k)]).filter(v => !isBlank(v)))];
+  const statusText = st === 'match' ? `✓ Matched: ${d.id} · ${BYID[d.id]?.name ?? '?'}`
+    : st === 'infer' ? `New parent (not in this file)${S.canon[n.key] && S.canon[n.key] !== n.name ? ` → “${S.canon[n.key]}”` : ''}`
+    : st === 'drop' ? 'Dropped: not a parent' : 'Undecided: click a match below, or choose';
+  return `<div class="dhead">
+      <div class="decide">
+        <div class="status ${st}" title="${esc(statusText)}">${esc(statusText)}</div>
+        <div class="dbtns">
+          <button data-act="infer" class="btn-infer">∅ No match: new parent</button>
+          <button data-act="drop" class="btn-drop" title="For junk such as URLs or notes">Not a parent</button>
+          ${st === 'pending' ? '' : '<button class="btn-drop" data-act="clear">↶ Undo</button>'}
+        </div>
+      </div>
+      <h2 style="margin-top:12px">${esc(n.name)}</h2>
+      <div class="muted" style="font-size:13px">Used as ${byLevel} · should match a <b>tier-${[...levels].sort().join('/')}</b> institution${n.variants.size > 1 ? ` · also written ${[...n.variants].filter(v => v !== n.name).map(v => `“${esc(v)}”`).join(', ')}` : ''}</div>
+      ${hasExpected ? '' : '<div class="warnline">No institutions of that tier in this file, so it is probably a new parent. Check below anyway.</div>'}
+    </div>
+    <input type="search" id="cq" placeholder="Search all ${INST.length} institutions…" value="${esc(UI.cq)}" style="margin-bottom:10px">
+    ${cands.length ? cands.map(x => `<div class="cand ${d?.type === 'match' && d.id === x.c.id ? 'chosen' : ''}" data-act="pick" data-id="${esc(x.c.id)}">
+        <div><div><span class="mono">${esc(x.c.id)}</span> ${esc(x.c.name)} ${tierBadge(x.c.tier, levels)}</div>
+          <div class="why">${esc(x.why || '')}${ROWBY[x.c.id] ? ' · parents: ' + esc(LEVELS.map(l => ROWBY[x.c.id][PCOL(l)]).filter(v => !isBlank(v)).join(' › ') || 'none') : ''}</div>
+          ${x.child ? `<div class="warnline">Looks like a sub-unit of “${esc(n.name)}”, not the same thing</div>` : ''}
+          ${n.occ.some(o => o.id === x.c.id) ? `<div class="warnline">This is one of the rows that uses this name</div>` : ''}</div>
+        <div class="score">${Math.round(x.score * 100)}% match<br><span class="pickbtn">${d?.type === 'match' && d.id === x.c.id ? '✓ Matched' : 'Match'}</span></div>
+      </div>`).join('') : `<div class="muted">No similar institutions found. Try the search box.</div>`}
+    <details class="more" id="det-occ" ${UI.det['det-occ'] ? 'open' : ''}><summary>Where it appears (${n.occ.length})</summary><ul class="occ">${occRows}</ul></details>
+    <details class="more" id="det-cells" ${UI.det['det-cells'] || UI.splitEdit ? 'open' : ''}><summary>Original cells (fix how a cell is split into parents)</summary><div class="cells" style="margin-top:6px">${cellTexts.map(ct => UI.splitEdit === ct
+      ? `<div><div class="muted" style="font-size:12px">One parent per line. Applies to every cell with exactly this text.</div><textarea id="splitTa" rows="4">${esc(splitCell(ct).join('\n'))}</textarea>
+           <div class="actions"><button class="primary small" data-act="saveSplit">Save split</button><button class="small" data-act="cancelSplit">Cancel</button>${S.splits[key(ct)] ? '<button class="small" data-act="autoSplit">Back to automatic</button>' : ''}</div></div>`
+      : `<div class="cellrow"><code>${esc(ct)}</code> → ${splitCell(ct).map(p => `<span class="tok ${key(p) === n.key ? 'pending' : 'drop'}" style="text-decoration:none">${esc(p)}</span>`).join('')} <button class="small ghost" data-act="editSplit" data-cell="${esc(ct)}">Edit split</button></div>`).join('')}</div></details>`;
+}
+function nextPendingAfter(k){
+  const list = visibleNames().filter(n => nameStatus(n.key) === 'pending');
+  const all = visibleNames(); const i = all.findIndex(n => n.key === k);
+  return all.slice(i + 1).find(n => nameStatus(n.key) === 'pending' && n.key !== k)?.key ?? list.find(n => n.key !== k)?.key ?? k;
+}
+function decide(dec){
+  const k = UI.sel1; if (!k) return;
+  const nx = nextPendingAfter(k);
+  act(() => { if (dec) S.decisions[k] = dec; else delete S.decisions[k]; });
+  if (dec){ UI.sel1 = nx; UI.cq = ''; UI.keep = true; UI.scroll = true; render(); }
+}
+
+/* tab 2 */
+function visibleSlots(){ return ST.bs.filter(b => UI.f2 === 'all' || b.status === UI.f2); }
+function slotEditor(rowId, k, sk){
+  const r = ROWBY[rowId];
+  const entries = cellParts(r, k);
+  const toks = entries.map((e, i) => tokHTML(resolve(e), `data-sk="${esc(sk)}" data-i="${i}"`)).join('');
+  const acOpen = UI.ac && UI.ac.sk === sk && UI.ac.q.trim();
+  let ac = '';
+  if (acOpen){
+    const res = searchInst(UI.ac.q);
+    const items = res.map(x => ({ id: x.c.id, html: `<span class="mono">${esc(x.c.id)}</span> ${esc(x.c.name)} <span class="tier">tier ${x.c.tier}</span>` }));
+    items.push({ name: UI.ac.q.trim(), html: `＋ New / unlisted parent: “${esc(UI.ac.q.trim())}”` });
+    UI.ac.items = items; UI.ac.hi = Math.min(UI.ac.hi ?? 0, items.length - 1);
+    ac = `<div class="ac">${items.map((it, i) => `<div class="${i === UI.ac.hi ? 'hi' : ''}" data-act="acPick" data-sk="${esc(sk)}" data-i="${i}">${it.html}</div>`).join('')}</div>`;
+  }
+  return `<div class="ed"><div>${toks ? '<span class="muted" style="font-size:12px">Current: </span>' + toks : ''}</div>
+    <input type="text" id="ac-${esc(sk)}" class="acin" data-sk="${esc(sk)}" placeholder="Search for another parent, or type a new name…" value="${esc(UI.ac && UI.ac.sk === sk ? UI.ac.q : '')}" autocomplete="off" style="margin-top:4px">${ac}</div>`;
+}
+function rowContext(r, skipK){
+  return LEVELS.filter(l => l !== skipK).map(l => { const v = resolvedCell(r, l); return `tier_${l}: ${v.length ? v.map(x => x.status === 'match' ? x.id + ' ' + x.name : x.name).join('; ') : '—'}`; }).join(' · ');
+}
+function nameWithPrefix(name){
+  const s = name.split(':'); if (s.length < 2) return esc(name);
+  return `<span class="pfx">${esc(s.slice(0, -1).join(':'))}:</span><b>${esc(s[s.length - 1])}</b>`;
+}
+function renderBlanks(){
+  const list = visibleSlots();
+  if (UI.sel2 >= list.length) UI.sel2 = Math.max(0, list.length - 1);
+  const c = s => ST.bs.filter(b => s === 'all' || b.status === s).length;
+  const labels = { pending: 'To do', filled: 'Filled', blank: 'Left blank', nosug: 'No suggestion', all: 'All' };
+  return `<div class="intro">Each card is a parent cell that is <b>empty</b> even though the institution’s tier says it should have a parent. Click a <b>suggestion</b>, click <b>Other…</b> to search for a different parent, or click <b>Leave blank</b>. <span class="undonote">Made a mistake? Press <b>Ctrl+Z</b> (<b>⌘Z</b> on a Mac) to undo.</span></div>
+  <div class="seg" style="margin-bottom:10px">${Object.keys(labels).map(s => `<button data-act="f2" data-v="${s}" class="${UI.f2 === s ? 'on' : ''}">${labels[s]} ${c(s)}</button>`).join('')}</div>
+  <div class="slotcards">${list.length ? list.map(b => {
+    const { r, k, sk } = b;
+    const known = LEVELS.filter(l => l !== k).map(l => { const v = resolvedCell(r, l); return v.length ? `tier_${l}: ` + v.map(x => x.status === 'match' ? x.id : x.name).join('; ') : null; }).filter(Boolean).join(' · ');
+    const shown = UI.moreSug[sk] ? b.sug : b.sug.slice(0, 2);
+    let body;
+    if (b.status === 'filled' || b.status === 'blank'){
+      const toks = cellParts(r, k).map((e, i) => tokHTML(resolve(e), `data-sk="${esc(sk)}" data-i="${i}"`)).join('');
+      body = `<div class="current">${b.status === 'filled' ? 'Filled with: ' + toks : '<span class="muted">Left blank.</span>'}<button class="small btn-drop" data-act="resetSlot" data-sk="${esc(sk)}">Change</button></div>`;
+    } else {
+      body = `<div class="opts">${shown.map((s, j) => `<button class="chip" data-act="chip" data-sk="${esc(sk)}" data-i="${j}"><span class="lbl">${esc(s.label)}</span>${s.entries.map(e => tokHTML(resolve(e))).join('')}</button>`).join('')}
+          ${b.sug.length > shown.length ? `<button class="optbtn ghost" data-act="moreSug" data-sk="${esc(sk)}">+${b.sug.length - shown.length} more</button>` : ''}
+          <button class="optbtn" data-act="other" data-sk="${esc(sk)}">✎ Other…</button>
+          <button class="optbtn blankbtn" data-act="leaveBlank" data-sk="${esc(sk)}">∅ Leave blank</button></div>
+        ${UI.other[sk] ? slotEditor(r.unique_id, k, sk) : ''}`;
+    }
+    const stl = { pending: 'to do', filled: 'filled', blank: 'left blank', nosug: 'no suggestion' }[b.status];
+    return `<div class="card slot st-${b.status}">
+      <div class="top"><div><span class="mono">${esc(r.unique_id)}</span> <span class="tier">tier ${tierOf(r)}</span> ${nameWithPrefix(r.institution_name)}</div>
+        <div class="right"><span class="statusp ${b.status}">${stl}</span></div></div>
+      <div class="ctx">Needs a <b style="color:var(--text)">tier_${k} parent</b>${known ? ' · already has ' + esc(known) : ''}</div>
+      ${body}
+    </div>`;
+  }).join('') : `<div class="card empty">${UI.f2 === 'pending' ? '🎉 Nothing left to do here.' : 'Nothing here.'}</div>`}</div>`;
+}
+
+/* tab 3 */
+function renderHarm(){
+  const cl = ST.cl, groups = cl.filter(c => c.members.length > 1), singles = cl.filter(c => c.members.length === 1);
+  const opts = cl.map(c => `<option value="${esc(c.members[0].key)}">${esc(c.current)}</option>`).join('');
+  return `<div class="intro">These parents are <b>not in this file</b> and will be added as new parents. Names that look like the same body are grouped. Choose <b>one spelling</b> for each group, and untick any name that doesn’t belong. <span class="undonote">Made a mistake? Press <b>Ctrl+Z</b> (<b>⌘Z</b> on a Mac) to undo.</span></div>
+  ${!cl.length ? `<div class="card empty">No inferred parents yet. Mark names as “No match” in tab 1 first.</div>` : ''}
+  ${groups.length ? `<h3 class="muted" style="font-size:12px;text-transform:uppercase">Possible variants (${groups.length})</h3>` : ''}
+  ${groups.map(g => `<div class="card cluster ${g.done ? 'done' : ''}">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${g.done ? '✓ ' : ''}Use one spelling for these ${g.members.length} names:</b></div>
+    ${g.members.map(m => `<div class="mem"><input type="checkbox" checked data-act="hOut" data-k="${esc(m.key)}" title="Untick: not the same body">
+      <input type="radio" name="r-${esc(g.sig)}" ${g.current === (S.canon[m.key] ?? m.name) && g.current === m.name ? 'checked' : ''} data-act="hCanon" data-sig="${esc(g.sig)}" data-v="${esc(m.name)}" title="Use this spelling">
+      <span>${esc(m.name)}</span><span class="muted" style="font-size:12px">${[...m.levels].sort().map(l => `<span class="lv">t${l}</span>`).join('')}×${m.occ.length}</span></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="hc-${esc(g.sig)}" data-sig="${esc(g.sig)}" class="hcustom" placeholder="…or type a custom spelling and press Enter" value="${esc(g.members.some(m => m.name === g.current) ? '' : g.current)}" style="flex:1;min-width:220px">
+      <button class="${g.done ? 'small' : 'primary small'}" data-act="hConfirm" data-sig="${esc(g.sig)}">${g.done ? 'Confirmed' : `Confirm “${esc(g.current)}”`}</button>
+    </div></div>`).join('')}
+  ${singles.length ? `<h3 class="muted" style="font-size:12px;text-transform:uppercase;margin-top:18px">Other new parents (${singles.length})</h3>
+  <div class="tablewrap"><table><thead><tr><th>Name as written</th><th>Used</th><th>Output spelling</th><th>Merge into…</th></tr></thead><tbody>
+  ${singles.map(g => { const m = g.members[0]; return `<tr><td>${esc(m.name)}</td><td>${[...m.levels].sort().map(l => `<span class="lv">t${l}</span>`).join('')}×${m.occ.length}</td>
+    <td><input type="text" class="hren" id="hr-${esc(m.key)}" data-k="${esc(m.key)}" value="${esc(S.canon[m.key] ?? '')}" placeholder="${esc(m.name)}"></td>
+    <td><select data-act="hMerge" data-k="${esc(m.key)}"><option value="">—</option>${opts.replace(`value="${esc(m.key)}"`, `value="${esc(m.key)}" disabled`)}</select></td></tr>`; }).join('')}
+  </tbody></table></div>` : ''}`;
+}
+function setGroupCanon(sig, v){
+  const g = ST.cl.find(c => c.sig === sig); if (!g || !v.trim()) return;
+  act(() => { g.members.forEach(m => { if (v.trim() === m.name) delete S.canon[m.key]; else S.canon[m.key] = v.trim(); }); S.hConfirmed[sig] = true; });
+}
+
+/* tab 4 */
+const F4 = {
+  all: ['All rows', () => true],
+  match: ['Linked to listed institutions', x => LEVELS.some(k => x.cells[k].some(c => c.status === 'match')), 'var(--ok)'],
+  infer: ['Linked to new parents', x => LEVELS.some(k => x.cells[k].some(c => c.status === 'infer')), 'var(--infer)'],
+  blank: ['With an expected parent blank', x => LEVELS.some(k => k < tierOf(x.r) && !x.cells[k].length)],
+  warn: ['With warnings', x => x.w.length, 'var(--warn)'],
+  open: ['With open decisions', x => x.w.some(w => /not yet decided|not reviewed/.test(w))],
+  changed: ['Changed from original', x => x.changed],
+};
+function renderReview(){
+  const q = norm(UI.q4);
+  const all = ROWS.map(r => { const cells = {}; LEVELS.forEach(k => cells[k] = resolvedCell(r, k));
+    return { r, cells, w: warnings(r), changed: LEVELS.some(k => cleanCell(r, k).name !== (isBlank(r[PCOL(k)]) ? 'NA' : r[PCOL(k)])) }; });
+  if (!F4[UI.f4]) UI.f4 = 'all';
+  const rows = all.filter(x => F4[UI.f4][1](x) && (!q || norm(x.r.institution_name + ' ' + x.r.unique_id).includes(q)));
+  return `<div class="intro">Click a <b>box</b> below to show only those rows, and <b>All rows</b> to show everything again. Click any <b>parent cell</b> to change it for that row only. <span class="undonote">Made a mistake? Press <b>Ctrl+Z</b> (<b>⌘Z</b> on a Mac) to undo.</span></div>
+  <div class="stats">${Object.entries(F4).map(([k, [label, fn, col]]) => `<button class="stat ${UI.f4 === k ? 'on' : ''}" data-act="f4" data-v="${k}"><b style="${col ? 'color:' + col : ''}">${all.filter(fn).length}</b>${label}</button>`).join('')}</div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+    <span>Showing <b>${rows.length}</b> of ${ROWS.length} rows${UI.f4 !== 'all' ? ` · ${esc(F4[UI.f4][0].toLowerCase())}` : ''}</span>
+    ${UI.f4 !== 'all' ? '<button class="small" data-act="f4" data-v="all">Show all rows</button>' : ''}
+    <input type="search" id="q4" placeholder="Search rows…" value="${esc(UI.q4)}" style="max-width:280px;margin-left:auto">
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>ID</th><th>Institution</th><th>Tier</th>${LEVELS.map(k => `<th>tier_${k} parent</th>`).join('')}<th>Warnings</th></tr></thead><tbody>
+  ${rows.length ? rows.map(({ r, w, cells }) => `<tr><td class="mono">${esc(r.unique_id)}</td><td>${esc(r.institution_name)}</td><td>${tierOf(r) === 99 ? '?' : tierOf(r)}</td>
+    ${LEVELS.map(k => { const v = cells[k]; const orig = r[PCOL(k)]; const ov = S.overrides[r.unique_id]?.[k];
+      return `<td class="cellv" data-act="cell" data-sk="${esc(r.unique_id + '|' + k)}" style="${k >= tierOf(r) && !v.length ? 'opacity:.45' : ''}">${v.length ? v.map(x => tokHTML(x)).join('') : '<span class="muted">—</span>'}
+        ${!isBlank(orig) || ov ? `<div class="orig">${ov ? '✎ edited · ' : ''}orig: ${isBlank(orig) ? 'blank' : esc(orig)}</div>` : ''}</td>`; }).join('')}
+    <td>${w.length ? `<ul class="wl">${w.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</td></tr>`).join('') : `<tr><td colspan="${LEVELS.length + 4}" class="empty">No rows in this view. <button class="small" data-act="f4" data-v="all">Show all rows</button></td></tr>`}
+  </tbody></table></div>`;
+}
+function renderModal(){
+  const [rowId, k] = UI.modal.split('|'), r = ROWBY[rowId], sk = UI.modal;
+  const ov = S.overrides[rowId]?.[k];
+  const sug = suggestions(r, +k);
+  return `<div class="modalbg" data-act="closeModal"><div class="card modal" data-stop="1">
+    <div class="muted" style="font-size:12px">Edit for this row only</div>
+    <h2 style="margin:2px 0 6px;font-size:18px"><span class="mono">${esc(rowId)}</span> ${esc(r.institution_name)} <span class="tier">tier ${tierOf(r)}</span></h2>
+    <div><b>tier_${k}_parent_name</b> · original: <code>${isBlank(r[PCOL(k)]) ? 'blank' : esc(r[PCOL(k)])}</code></div>
+    ${sug.length ? `<div class="chips">${sug.map((s, j) => `<button class="chip" data-act="chip" data-sk="${esc(sk)}" data-i="${j}"><span class="lbl">${esc(s.label)}</span>${s.entries.map(e => tokHTML(resolve(e))).join('')}</button>`).join('')}</div>` : ''}
+    ${slotEditor(rowId, +k, sk)}
+    <div class="actions">${ov ? `<button data-act="resetSlot" data-sk="${esc(sk)}">Revert to original</button>` : ''}<button data-act="clearSlot" data-sk="${esc(sk)}">Make blank</button><button class="primary" data-act="closeModal" style="margin-left:auto">Done</button></div>
+  </div></div>`;
+}
+
+/* ---------- export / files ---------- */
+function cleanCell(r, k){
+  const v = resolvedCell(r, k);
+  if (!v.length) return { name: 'NA', id: 'NA' };
+  return { name: v.map(x => x.name).join('; '), id: v.map(x => x.status === 'match' ? x.id : 'NA').join('; ') };
+}
+function buildCSV(){
+  const head = [...HEAD]; LEVELS.forEach(k => head.push(`tier_${k}_parent_name_clean`, `tier_${k}_parent_id`)); head.push('parent_match_warnings');
+  const lines = [head.map(csvCell).join(',')];
+  ROWS.forEach(r => {
+    const out = HEAD.map(h => r[h]);
+    LEVELS.forEach(k => { const c = cleanCell(r, k); out.push(c.name, c.id); });
+    out.push(warnings(r).join(' | ') || 'NA');
+    lines.push(out.map(csvCell).join(','));
+  });
+  return lines.join('\n') + '\n';
+}
+async function saveFile(name, text, mime, desc, ext){
+  if (window.showSaveFilePicker){
+    try {
+      const h = await showSaveFilePicker({ suggestedName: name, types: [{ description: desc, accept: { [mime]: [ext] } }] });
+      const w = await h.createWritable(); await w.write(text); await w.close(); toast('Saved ' + h.name); return;
+    } catch (e){ if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('Downloaded ' + name);
+}
+function doExport(){
+  const open = ST.p1 + ST.p2 + ST.p3;
+  if (open && !confirm(`${open} decision(s) are still open. Undecided names are exported as written, with id “NA” and a warning. Export anyway?`)) return;
+  saveFile(`${CODE}_parents_matched.csv`, buildCSV(), 'text/csv', 'CSV', '.csv');
+}
+
+/* ---------- events ---------- */
+function handle(action, el, ev){
+  const d = el.dataset;
+  switch (action){
+    case 'tab': UI.tab = +d.v; UI.ac = null; render(); window.scrollTo(0, 0); break;
+    case 'menu': $('#menuPop').classList.toggle('hidden'); return;
+    case 'undo': undo(); break;
+    case 'export': doExport(); break;
+    case 'saveProg': UNSAVED = 0; SAVED_TO_FILE = true; showSaveState(); saveFile(`${CODE}_tierPixie_progress.json`, JSON.stringify({ code: CODE, hash: HASH, state: S }, null, 1), 'application/json', 'JSON', '.json'); break;
+    case 'loadProg': $('#fileProg').click(); break;
+    case 'openCsv': $('#fileCsv').click(); break;
+    case 'help': alert(HELP); break;
+    case 'reset': if (confirm('Delete every decision for this file? (You can still Undo.)')) act(() => { const s = blankState(); Object.keys(S).forEach(k => delete S[k]); Object.assign(S, s); }); break;
+    case 'f1': UI.f1 = d.v; UI.sel1 = null; render(); break;
+    case 'lv1': UI.lv1 = d.v; UI.sel1 = null; render(); break;
+    case 'sel1': UI.sel1 = d.k; UI.cq = ''; UI.splitEdit = null; UI.occAll = false; UI.keep = true; render(); break;
+    case 'pick': decide({ type: 'match', id: d.id }); break;
+    case 'infer': decide({ type: 'infer' }); break;
+    case 'drop': decide({ type: 'drop' }); break;
+    case 'clear': UI.keep = true; decide(null); break;
+    case 'occAll': UI.occAll = !UI.occAll; UI.keep = true; render(); break;
+    case 'bulkExact': {
+      const pend = ST.names.filter(n => nameStatus(n.key) === 'pending');
+      const ex = pend.map(n => [n, candidates(n.name, n.levels)]).filter(([n, c]) => c[0] && c[0].score >= 0.95 && c[0].tierOk && !c[0].child && !(c[1] && c[1].score >= 0.95));
+      if (confirm('Accept these matches?\n\n' + ex.map(([n, c]) => `${n.name}  →  ${c[0].c.id} ${c[0].c.name}`).join('\n'))) act(() => ex.forEach(([n, c]) => S.decisions[n.key] = { type: 'match', id: c[0].c.id }));
+      break;
+    }
+    case 'bulkLow': {
+      const pend = ST.names.filter(n => nameStatus(n.key) === 'pending');
+      const lo = pend.filter(n => { const c = candidates(n.name, n.levels); return !c[0] || c[0].score < 0.45; });
+      if (confirm('Mark these as new (inferred) parents? Their best candidate scores under 45%.\n\n' + lo.map(n => n.name).join('\n'))) act(() => lo.forEach(n => S.decisions[n.key] = { type: 'infer' }));
+      break;
+    }
+    case 'editSplit': UI.splitEdit = d.cell; UI.keep = true; render(); $('#splitTa')?.focus(); break;
+    case 'cancelSplit': UI.splitEdit = null; UI.keep = true; render(); break;
+    case 'saveSplit': { const lines = $('#splitTa').value.split('\n').map(s => s.trim()).filter(Boolean); const ct = UI.splitEdit; UI.splitEdit = null; UI.keep = true; act(() => { S.splits[key(ct)] = lines; }); break; }
+    case 'autoSplit': { const ct = UI.splitEdit; UI.splitEdit = null; UI.keep = true; act(() => { delete S.splits[key(ct)]; }); break; }
+    case 'f2': UI.f2 = d.v; UI.sel2 = 0; render(); break;
+    case 'sel2': if (UI.sel2 !== +d.v){ UI.sel2 = +d.v; render(); } return;
+    case 'chip': { const [rowId, k] = d.sk.split('|'); const s = suggestions(ROWBY[rowId], +k)[+d.i]; act(() => { setOverride(rowId, +k, s.entries.map(e => ({ ...e }))); delete S.blankDone[d.sk]; }); break; }
+    case 'leaveBlank': { const [rowId, k] = d.sk.split('|'); act(() => { clearOverride(rowId, +k); S.blankDone[d.sk] = true; }); break; }
+    case 'resetSlot': { const [rowId, k] = d.sk.split('|'); act(() => { clearOverride(rowId, +k); delete S.blankDone[d.sk]; }); break; }
+    case 'clearSlot': { const [rowId, k] = d.sk.split('|'); act(() => setOverride(rowId, +k, [])); break; }
+    case 'rmEntry': { const [rowId, k] = d.sk.split('|'); const cur = cellParts(ROWBY[rowId], +k).slice(); cur.splice(+d.i, 1); act(() => setOverride(rowId, +k, cur.map(e => ({ ...e })))); break; }
+    case 'acPick': acPick(d.sk, +d.i); break;
+    case 'hConfirm': { const g = ST.cl.find(c => c.sig === d.sig); setGroupCanon(d.sig, g.current); break; }
+    case 'f4': UI.f4 = d.v; render(); break;
+    case 'forgetCode': try { localStorage.removeItem(PASSKEY()); } catch (e){} location.reload(); break;
+    case 'dismissNoStore': UI.noStoreDismissed = true; render(); break;
+    case 'moreSug': UI.moreSug[d.sk] = true; render(); break;
+    case 'other': UI.other[d.sk] = !UI.other[d.sk]; render(); if (UI.other[d.sk]) $(`#ac-${CSS.escape(d.sk)}`)?.focus(); break;
+    case 'cell': UI.modal = d.sk; UI.ac = null; render(); $(`#ac-${CSS.escape(d.sk)}`)?.focus(); break;
+    case 'closeModal': if (ev.target === el){ UI.modal = null; UI.ac = null; render(); } break;
+  }
+  if (action !== 'menu') $('#menuPop').classList.add('hidden');
+}
+function acPick(sk, i){
+  const it = UI.ac?.items?.[i]; if (!it) return;
+  const [rowId, k] = sk.split('|');
+  const cur = cellParts(ROWBY[rowId], +k).map(e => ({ ...e }));
+  cur.push(it.id ? { id: it.id } : { name: it.name });
+  UI.ac = { sk, q: '', hi: 0 };
+  act(() => { setOverride(rowId, +k, cur); delete S.blankDone[sk]; });
+}
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el){ $('#menuPop').classList.add('hidden'); return; }
+  if (el.tagName === 'INPUT' || el.tagName === 'SELECT') return;
+  if (el.dataset.act === 'closeModal' && ev.target.closest('[data-stop]') && el.classList.contains('modalbg')) return;
+  handle(el.dataset.act, el, ev);
+});
+document.addEventListener('toggle', ev => { if (ev.target.id && ev.target.tagName === 'DETAILS') UI.det[ev.target.id] = ev.target.open; }, true);
+document.addEventListener('change', ev => {
+  const el = ev.target, d = el.dataset;
+  if (d.act === 'hCanon') setGroupCanon(d.sig, d.v);
+  else if (d.act === 'hOut') act(() => { S.hSplit[d.k] = true; S.hMerge = S.hMerge.filter(p => !p.includes(d.k)); });
+  else if (d.act === 'hMerge' && el.value) act(() => { S.hMerge.push([d.k, el.value]); delete S.hSplit[d.k]; });
+  else if (el.classList.contains('hren')) act(() => { const v = el.value.trim(); if (v) S.canon[d.k] = v; else delete S.canon[d.k]; });
+});
+document.addEventListener('input', ev => {
+  const el = ev.target;
+  if (el.id === 'q1'){ UI.q1 = el.value; UI.sel1 = null; render(); }
+  else if (el.id === 'cq'){ UI.cq = el.value; UI.keep = true; render(); }
+  else if (el.id === 'q4'){ UI.q4 = el.value; render(); }
+  else if (el.classList.contains('acin')){ UI.ac = { sk: el.dataset.sk, q: el.value, hi: 0 }; render(); }
+});
+document.addEventListener('keydown', ev => {
+  const el = ev.target, inField = /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+  if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'z' && !inField){ ev.preventDefault(); undo(); return; }
+  if (el.classList && el.classList.contains('acin') && UI.ac){
+    const n = UI.ac.items?.length || 0;
+    if (ev.key === 'ArrowDown'){ ev.preventDefault(); UI.ac.hi = Math.min(n - 1, (UI.ac.hi || 0) + 1); render(); }
+    else if (ev.key === 'ArrowUp'){ ev.preventDefault(); UI.ac.hi = Math.max(0, (UI.ac.hi || 0) - 1); render(); }
+    else if (ev.key === 'Enter' && n && UI.ac.q.trim()){ ev.preventDefault(); acPick(UI.ac.sk, UI.ac.hi || 0); }
+    else if (ev.key === 'Escape'){ UI.ac = null; render(); el.blur(); }
+    return;
+  }
+  if (el.classList && el.classList.contains('hcustom') && ev.key === 'Enter'){ setGroupCanon(el.dataset.sig, el.value); return; }
+  if (el.id === 'cq' && ev.key === 'Enter'){ const f = $('.cand'); if (f) handle('pick', f, ev); return; }
+  if (ev.key === 'Escape'){
+    if (UI.modal){ UI.modal = null; UI.ac = null; render(); return; }
+    if (inField){ el.blur(); return; }
+  }
+  if (inField || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  const k = ev.key;
+  if (UI.tab === 1){
+    const list = visibleNames(), i = list.findIndex(n => n.key === UI.sel1);
+    if (k === 'ArrowDown' || k === 'j'){ ev.preventDefault(); const n = list[Math.min(list.length - 1, i + 1)]; if (n){ UI.sel1 = n.key; UI.cq = ''; UI.keep = true; UI.scroll = true; render(); } }
+    else if (k === 'ArrowUp' || k === 'k'){ ev.preventDefault(); const n = list[Math.max(0, i - 1)]; if (n){ UI.sel1 = n.key; UI.cq = ''; UI.keep = true; UI.scroll = true; render(); } }
+    else if (/^[1-9]$/.test(k)){ const c = document.querySelectorAll('.cand')[+k - 1]; if (c) decide({ type: 'match', id: c.dataset.id }); }
+    else if (k === 'Enter'){ const c = $('.cand'); if (c) decide({ type: 'match', id: c.dataset.id }); }
+    else if (k === 'n'){ decide({ type: 'infer' }); }
+    else if (k === 'x'){ decide({ type: 'drop' }); }
+    else if (k === 'u'){ UI.keep = true; decide(null); }
+    else if (k === '/'){ ev.preventDefault(); $('#cq')?.focus(); }
+
+  }
+});
+const HELP = `Keyboard shortcuts
+
+Tab 1 · Match parent names
+  ↑ ↓ / j k   previous / next name
+  1–9         pick that candidate
+  Enter       pick the top candidate
+  n           no match → new (inferred) parent
+  x           drop (not a parent, e.g. a URL)
+  u           clear the decision
+  /           search all institutions
+
+Tab 2 · Fill blank parents
+  j k         previous / next cell
+  1–9         use that suggestion
+  b           leave blank
+  /           type a parent (↑ ↓ Enter in the dropdown)
+
+Anywhere
+  Ctrl/Cmd+Z  undo
+  Esc         close dialog / leave a text box
+
+Progress autosaves in this browser. Use ⋯ → “Save progress file” to keep a copy or move to another computer.`;
+
+$('#fileCsv').addEventListener('change', async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const text = await f.text(); init(f.name.replace(/\.csv$/i, '').replace(/[^A-Za-z0-9_-]+/g, '_'), f.name, text); ev.target.value = '';
+});
+$('#fileProg').addEventListener('change', async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    if (j.code !== CODE && !confirm(`This progress file is for “${j.code}”, not “${CODE}”. Load it anyway?`)) return;
+    if (j.hash !== HASH && !confirm('The CSV has changed since this progress was saved. Decisions are keyed by name, so most will still apply. Load it?')) return;
+    act(() => { Object.keys(S).forEach(k => delete S[k]); Object.assign(S, blankState(), j.state); });
+    toast('Progress loaded');
+  } catch (e){ alert('Could not read that file: ' + e.message); }
+  ev.target.value = '';
+});
+
+/* ---------- access code: the CSV is AES-GCM encrypted with a key derived from the code ---------- */
+const PASSKEY = () => 'tierPixie-pass:' + EMBED.code;
+async function decryptCSV(pass){
+  const b = x => Uint8Array.from(atob(x), c => c.charCodeAt(0)), e = EMBED.enc;
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  const k = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b(e.salt), iterations: e.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b(e.iv) }, k, b(e.ct)));
+}
+async function boot(){
+  if (!EMBED.enc) return init(EMBED.code, EMBED.file, EMBED.csv);
+  $('#forgetBtn').classList.remove('hidden');
+  const lock = $('#lock'); lock.classList.remove('hidden');
+  if (!window.crypto || !crypto.subtle){ $('#lockErr').textContent = 'This browser can’t decrypt here. Open the page over https or from your computer.'; return; }
+  let saved = null; try { saved = localStorage.getItem(PASSKEY()); } catch (e){}
+  if (saved){ try { const csv = await decryptCSV(saved); lock.classList.add('hidden'); return init(EMBED.code, EMBED.file, csv); } catch (e){} }
+  $('#lockPass').focus();
+  $('#lockForm').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const pass = $('#lockPass').value; $('#lockErr').textContent = ''; $('#lockBtn').disabled = true;
+    try {
+      const csv = await decryptCSV(pass);
+      if ($('#lockRemember').checked){ try { localStorage.setItem(PASSKEY(), pass); } catch (e){} }
+      lock.classList.add('hidden'); init(EMBED.code, EMBED.file, csv);
+    } catch (e){ $('#lockErr').textContent = 'That code didn’t work.'; $('#lockPass').select(); }
+    $('#lockBtn').disabled = false;
+  });
+}
+boot();
+</script>
+</body>
+</html>
