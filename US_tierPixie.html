@@ -884,6 +884,7 @@ function handle(action, el, ev){
     case 'hConfirm': { const g = ST.cl.find(c => c.sig === d.sig); setGroupCanon(d.sig, g.current); break; }
     case 'f4': UI.f4 = d.v; render(); break;
     case 'forgetCode': try { localStorage.removeItem(PASSKEY()); } catch (e){} location.reload(); break;
+    case 'syncRetry': clearTimeout(SYNC_TIMER); syncStart(); break;
     case 'dismissNoStore': UI.noStoreDismissed = true; render(); break;
     case 'moreSug': UI.moreSug[d.sk] = true; render(); break;
     case 'other': UI.other[d.sk] = !UI.other[d.sk]; render(); if (UI.other[d.sk]) $(`#ac-${CSS.escape(d.sk)}`)?.focus(); break;
@@ -1014,8 +1015,15 @@ function startWith(text){
 }
 const syncStatus = html => { $('#saved').innerHTML = html; };
 const okText = ts => `<span style="color:var(--ok);font-weight:600">✓ Saved</span> · ${new Date(ts || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+function syncWait(html){
+  let d = $('#syncwait');
+  if (html == null){ if (d) d.remove(); return; }
+  if (!d){ d = document.createElement('div'); d.id = 'syncwait'; d.className = 'modalbg'; d.style.alignItems = 'center'; d.style.background = 'var(--bg)'; document.body.appendChild(d); }
+  d.innerHTML = `<div class="card modal" style="width:min(440px,100%);display:flex;flex-direction:column;gap:12px;text-align:center">${html}</div>`;
+}
 async function syncStart(){
   syncStatus('Loading saved work…');
+  syncWait('<h2 style="margin:0;font-size:20px">Connecting to the results sheet…</h2><div class="muted">Loading the latest saved work.</div>');
   try {
     const r = await (await fetch(`${SYNC.url}?dataset=${encodeURIComponent(CODE)}&token=${encodeURIComponent(SYNC.token)}`)).json();
     if (!r.ok) throw new Error(r.error || 'error');
@@ -1024,11 +1032,18 @@ async function syncStart(){
       S = Object.assign(blankState(), r.state); UNDO = []; writeLocal(); render();
       toast('Loaded the latest saved work');
     }
-    SYNC_READY = true;
-    if (SYNC_PENDING || (S._ts || 0) > remoteTs) queueSync(); else syncStatus(okText(remoteTs || Date.now()));
+    SYNC_READY = true; SYNC_FAILS = 0; syncWait(null);
+    if ((S._ts || 0) > remoteTs) queueSync(); else { SYNC_PENDING = false; syncStatus(okText(remoteTs || Date.now())); }
   } catch (e){
-    SYNC_READY = true; syncStatus('<span style="color:var(--warn);font-weight:600">⚠ Can’t reach the results sheet</span> · retrying');
-    SYNC_PENDING = true; retrySync();
+    // Never save before the sheet's copy has been read: retry the LOAD, keep local edits pending
+    SYNC_READY = false;
+    const wait = Math.min(60000, 5000 * 2 ** SYNC_FAILS++);
+    syncStatus(`<span style="color:var(--warn);font-weight:600" title="${esc(String(e && e.message || e))}">⚠ Can’t reach the results sheet</span> · retrying`);
+    syncWait(`<h2 style="margin:0;font-size:20px">⚠ Can’t reach the results sheet</h2>
+      <div class="muted">Your work is saved there, so the tool waits until it can load it. It will try again in ${Math.round(wait / 1000)} seconds. Check your internet connection, or try another browser.</div>
+      <div class="muted" style="font-size:12px">Reason: ${esc(String(e && e.message || e))}</div>
+      <button class="primary" data-act="syncRetry">Try again now</button>`);
+    clearTimeout(SYNC_TIMER); SYNC_TIMER = setTimeout(syncStart, wait);
   }
 }
 function queueSync(){
@@ -1049,7 +1064,7 @@ async function doSync(){
     SYNC_FAILS = 0;
     if (seq === SYNC_SEQ){ SYNC_PENDING = false; syncStatus(okText()); }
   } catch (e){
-    syncStatus('<span style="color:var(--warn);font-weight:600">⚠ Not saved yet</span> · retrying');
+    syncStatus(`<span style="color:var(--warn);font-weight:600" title="${esc(String(e && e.message || e))}">⚠ Not saved yet</span> · retrying`);
     retrySync();
   }
 }
