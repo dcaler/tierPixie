@@ -156,7 +156,8 @@ td.cellv{cursor:pointer;min-width:160px} td.cellv:hover{background:var(--accent-
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
 #lock form{width:min(380px,100%);padding:28px;display:flex;flex-direction:column;gap:12px}
 #lock h2{margin:0;font-size:22px}
-#lock .err{color:var(--bad);font-size:13px;min-height:18px}
+#lock .err{min-height:0}
+#lock .err:not(:empty){color:var(--bad);background:var(--bad-soft);border:1.5px solid var(--bad);border-radius:7px;padding:8px 12px;font-weight:600;font-size:14px}
 .nostore{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);border:1px solid var(--warn);border-left:6px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:14.5px}
 button.warnbtn{background:var(--warn);border-color:var(--warn);color:#fff}
 button.warnbtn:hover{filter:brightness(1.1);background:var(--warn)}
@@ -1005,13 +1006,15 @@ async function boot(){
   $('#lockPass').focus();
   $('#lockForm').addEventListener('submit', async ev => {
     ev.preventDefault();
-    const pass = $('#lockPass').value; $('#lockErr').textContent = ''; $('#lockBtn').disabled = true;
+    const raw = $('#lockPass').value; $('#lockErr').textContent = ''; $('#lockBtn').disabled = true; $('#lockBtn').textContent = 'Checking…';
+    let csv = null, pass = raw;
+    for (const p of [...new Set([raw, raw.trim()])]){ try { csv = await decryptCSV(p); pass = p; break; } catch (e){} }
     try {
-      const csv = await decryptCSV(pass);
+      if (csv === null) throw new Error('bad code');
       if ($('#lockRemember').checked){ try { localStorage.setItem(PASSKEY(), pass); } catch (e){} }
       lock.classList.add('hidden'); init(EMBED.code, EMBED.file, csv);
-    } catch (e){ $('#lockErr').textContent = 'That code didn’t work.'; $('#lockPass').select(); }
-    $('#lockBtn').disabled = false;
+    } catch (e){ $('#lockErr').textContent = '✕ That code didn’t work. Check it and try again.'; $('#lockPass').select(); }
+    $('#lockBtn').disabled = false; $('#lockBtn').textContent = 'Unlock';
   });
 }
 boot();
